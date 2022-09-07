@@ -31,7 +31,7 @@ def index():
 
             channel_url = x.get_channel_link()
             channel_name = x.channel_name(channel_url)
-            video_links = x.get_video_title_links_thumb(f"{channel_url}/videos")
+            video_links = x.get_video_title_links_thumb(f"{channel_url}/videos", n=n)
 
             f_output = {'Title': [], "Video Link": [], "Thumbnail Link": [],
                         'Total Likes': [], 'Total Comments': [], 'Comment Content': []}
@@ -132,7 +132,7 @@ def index():
                     collection = mydb['youtubers']
                 else:
                     collection = mydb['youtubers']
-                print("MySQL : Connection Established!")
+                print("MongoDB : Connection Established!")
                 try:
                     mongo_dict = {'_id': channel_name + "||" + str(datetime.now())[:19]}
                     for i in range(n):

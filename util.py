@@ -60,7 +60,7 @@ class YTChannelScraper:
             return "Failed!"
 
 
-    def get_video_title_links_thumb(self,url):
+    def get_video_title_links_thumb(self,url,n):
         try:
             st = time.time()
             options = webdriver.ChromeOptions()
@@ -69,8 +69,8 @@ class YTChannelScraper:
             driver.maximize_window()
             driver.get(url)
             video_links = []
-
-            for i in list(range(0, 5000, 500)):
+            scroll_h = int(n/10)*1000 + 500
+            for i in list(range(0, scroll_h, 500)):
                 driver.execute_script(f"window.scrollTo( {0 + i},{500 + i}, 'smooth')")
                 time.sleep(1)
                 soup = BeautifulSoup(driver.page_source, 'html.parser')
@@ -116,17 +116,20 @@ class YTChannelScraper:
             wd.maximize_window()
 
             wd.get(url)
-            wd.execute_script("window.scrollTo(0,250)")
+            wd.execute_script("window.scrollTo(0,300)")
             time.sleep(1)
 
             soup = BeautifulSoup(wd.page_source, 'html.parser')
             wd.close()
 
             like = soup.select("ytd-toggle-button-renderer #text")[0].text
-            print(f"Success : Like Count || Time taken : {int(time.time() - st)} sec")
 
-            return like
-
+            if like == 'Hide chat reply':
+                print(f"Success : Like Count || Time taken : {int(time.time() - st)} sec")
+                return soup.select("ytd-toggle-button-renderer #text")[1].text
+            else :
+                print(f"Success : Like Count || Time taken : {int(time.time() - st)} sec")
+                return like
         except Exception as e:
             print("Failed : Like Count with Error -- ", e)
             return 'NAN'
@@ -150,8 +153,10 @@ class YTChannelScraper:
                 EC.visibility_of_element_located((By.XPATH, "//h2[@id='count']/yt-formatted-string"))).text
 
             driver.quit()
-            print(f"SUCCESS : Comment Count || Time taken : {int(time.time() - st)} sec.")
-            return comment_count.split(" ")[0]
+            cc = comment_count.split(" ")[0]
+            if float(cc)>=0:
+                print(f"SUCCESS : Comment Count || Time taken : {int(time.time() - st)} sec.")
+                return cc
         except Exception as e:
             print("Failed : Comment Count with Error -- ", e)
             return 'NAN'
@@ -184,19 +189,24 @@ class YTChannelScraper:
             driver = webdriver.Chrome(options=options)
             driver.maximize_window()
             driver.get(url)
-
-            scroll_down(driver, scroll_height=600)
-            soup = BeautifulSoup(driver.page_source, 'html.parser')
+            for i in list(range(0, 10000, 500)):
+                driver.execute_script(f"window.scrollTo( {0 + i},{500 + i}, 'smooth')")
+                time.sleep(1)
+                soup = BeautifulSoup(driver.page_source, 'html.parser')
             driver.quit()
 
+            st1 = time.time()
             commenter = soup.select("#comment #author-text span")
             comment_div = soup.select("#content #content-text")
             comment_list = [x.text for x in comment_div]
             commenter_list = [y.text.replace("\n", "").strip() for y in commenter]
+
+            st2 = time.time()
             comment_output = []
             for i in range(len(comment_list)):
                 comment_output.append([ commenter_list[i] , comment_list[i]])
             print(f"{len(comment_output)} comments extracted with name in {int((time.time() - st))} sec.")
+            print(f"S.T.= {int(st1-st)}, E.T.= {st2-st1}, L.P.T={(time.time() - st2)}")
             return comment_output
         except Exception as e:
             print("Error3 : ", e)
