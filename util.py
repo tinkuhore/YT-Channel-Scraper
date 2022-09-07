@@ -195,18 +195,18 @@ class YTChannelScraper:
                 soup = BeautifulSoup(driver.page_source, 'html.parser')
             driver.quit()
 
-            st1 = time.time()
+            # st1 = time.time()
             commenter = soup.select("#comment #author-text span")
             comment_div = soup.select("#content #content-text")
             comment_list = [x.text for x in comment_div]
             commenter_list = [y.text.replace("\n", "").strip() for y in commenter]
 
-            st2 = time.time()
+            # st2 = time.time()
             comment_output = []
             for i in range(len(comment_list)):
                 comment_output.append([ commenter_list[i] , comment_list[i]])
             print(f"{len(comment_output)} comments extracted with name in {int((time.time() - st))} sec.")
-            print(f"S.T.= {int(st1-st)}, E.T.= {st2-st1}, L.P.T={(time.time() - st2)}")
+            # print(f"S.T.= {int(st1-st)}, E.T.= {st2-st1}, L.P.T={(time.time() - st2)}")
             return comment_output
         except Exception as e:
             print("Error3 : ", e)
