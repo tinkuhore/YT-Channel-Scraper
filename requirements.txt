@@ -1,0 +1,12 @@
+flask
+beautifulsoup4
+requests
+requests_html
+pandas
+pytz
+python-dateutil
+selenium
+pafy
+mysql-connector-python
+pyshorteners
+pymongo
