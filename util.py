@@ -124,9 +124,10 @@ class YTChannelScraper:
 
             like = soup.select("ytd-toggle-button-renderer #text")[0].text
 
-            if like == 'Hide chat reply':
+            if 'Hide' in like:
                 print(f"Success : Like Count || Time taken : {int(time.time() - st)} sec")
-                return soup.select("ytd-toggle-button-renderer #text")[1].text
+                like = soup.select("ytd-toggle-button-renderer #text")[1].text
+                return like
             else :
                 print(f"Success : Like Count || Time taken : {int(time.time() - st)} sec")
                 return like
