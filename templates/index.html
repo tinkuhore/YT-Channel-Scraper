@@ -2,35 +2,42 @@
 
 {% block head %}
 
-<title>Scraper</title>
+<title xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
+       xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">Scraper</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <h1 style="text-align: center">--- Youtube Channel Scraper---</h1>
-
+    <h1 style="text-align: center">--- Youtube Channel Scraper---</h1></br>
+    <h2 style="text-align: center">Search for any YouTube Channel and Scrape the latest videos to extract Video Title,
+        Video URL, Total Likes, Total Comments and All Comments with commentary's name. </h2></br>
     <div class="form">
         <form action="/scraper" method="POST">
-            <h2 style="text-align: center">Enter Channel Name :</h2>
-            <input type="text" name="search" id="search">
-            <h2 style="text-align: center">How many videos do you want to explore?</h2>
-            <input type="text" name="n" id="n"></br></br>
+            <h2 style="text-align: center">Enter Channel Name : <input type="text" name="search" id="search"> </h2>
+
+            <h2 style="text-align: center">How many videos do you want to explore? <input type="text" name="n" id="n"></h2></br>
 
             <h2 style="text-align: center">
-                   <b>Program is going to store Collected Information into the DATABASE</b> </h2>
-            <h2 style="text-align: center">You Need To Provide The Following CREDENTIALS</h2>
-            <h3 style="text-align: center">MySQL Hostname : <input type="text" name="host" id="host"> </h3>
+                   <b>Program is going to store Collected Information into the DATABASE</b></br>
+                    You Need To Provide The Following CREDENTIALS </h2>
+            <h2 style="text-align: center"></h2></br>
 
-            <h3 style="text-align: center">MySQL Username : <input type="text" name="user" id="user"> </h3>
+            <h3 style="text-align: center"> MySQL</h3>
+            <h3 style="text-align: center">Hostname : <input type="text" name="host" id="host"> </h3>
+            <h3 style="text-align: center">Username : <input type="text" name="user" id="user"> </h3>
+            <h3 style="text-align: center">Password : <input type="text" name="passwd" id="passwd"> </h3></br>
 
-            <h3 style="text-align: center">MySQL Password : <input type="text" name="passwd" id="passwd"> </h3>
+            <h3 style="text-align: center"> MongoDB</h3>
+            <h3 style="text-align: center">Username : <input type="text" name="username" id="username"> </h3>
+            <h3 style="text-align: center">Password : <input type="text" name="password" id="password"> </h3></br>
 
-            <h3 style="text-align: center">MongoDB Username : <input type="text" name="username" id="username"> </h3>
 
-            <h3 style="text-align: center">MongoDB Username : <input type="text" name="password" id="password"> </h3>
+            <h3 style="text-align: center">
+                Note: Processing time depends on No. of videos and No. of Comments in each video.</h3>
+            <h2 style="text-align: center">Click 'Submit' and Please wait...</h2>
 
-            <input type="Submit" >
+            <h2 style="text-align: center"><input type="Submit" ></h2>
         </form>
     </div>
 </div>
