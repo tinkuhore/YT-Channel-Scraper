@@ -4,7 +4,7 @@ from util import YTChannelScraper
 import time
 from datetime import datetime
 import pandas as pd
-import mysql.connector
+#import mysql.connector
 import pymongo
 import base64
 import requests
@@ -74,45 +74,45 @@ def index():
 
             # To store data in MySQL
             mdf = pd.DataFrame(f_output)
-            df = mdf.drop(['Comment Content'], axis=1)
-            df.insert(0, 'YoutuberName', channel_name)
-            try:
-                st = time.time()
-                mydb = mysql.connector.connect(
-                    host=request.form.get('host'),
-                    user=request.form.get('user'),
-                    passwd=request.form.get('passwd'),
-                    auth_plugin='mysql_native_password'
-                )
-                print("MySQL : Connection Established!")
-
-                try:
-                    cursor = mydb.cursor()
-                    cursor.execute("CREATE DATABASE IF NOT EXISTS YT_channel_scraper")
-                    cursor.execute("CREATE TABLE IF NOT EXISTS YT_channel_scraper.youtubers (YoutuberName varchar(100),\
-                                                                                            VideoTitle varchar(200),\
-                                                                                            VideoURL varchar(30), \
-                                                                                            ThumbnailURL varchar(30), \
-                                                                                            TotalLikes varchar(30), \
-                                                                                            TotalComments varchar(30))")
-
-                    query = "INSERT INTO YT_channel_scraper.youtubers (YoutuberName , VideoTitle , VideoURL , " \
-                            "ThumbnailURL , TotalLikes , TotalComments ) VALUES (%s,%s,%s,%s,%s,%s) "
-                    val = []
-                    for i in range(n):
-                        val.append(tuple(df.iloc[i]))
-
-                    cursor.executemany(query, val)
-                    mydb.commit()
-                    print("Data INSERTED successfully INTO MySQL", '\n', "Database name : YT_channel_scraper", '\n',
-                          "Table name : youtubers "
-                          )
-                except Exception as e:
-                    print("Failed to insert into MySQL with Error : ", e)
-                print(f"Time taken : {round(time.time() - st, 2)} sec")
-                print("*" * 30, '\n')
-            except Exception as e:
-                print("MySQL : Connection Failed! with Error : ", e)
+            # df = mdf.drop(['Comment Content'], axis=1)
+            # df.insert(0, 'YoutuberName', channel_name)
+            # try:
+            #     st = time.time()
+            #     mydb = mysql.connector.connect(
+            #         host=request.form.get('host'),
+            #         user=request.form.get('user'),
+            #         passwd=request.form.get('passwd'),
+            #         auth_plugin='mysql_native_password'
+            #     )
+            #     print("MySQL : Connection Established!")
+            #
+            #     try:
+            #         cursor = mydb.cursor()
+            #         cursor.execute("CREATE DATABASE IF NOT EXISTS YT_channel_scraper")
+            #         cursor.execute("CREATE TABLE IF NOT EXISTS YT_channel_scraper.youtubers (YoutuberName varchar(100),\
+            #                                                                                 VideoTitle varchar(200),\
+            #                                                                                 VideoURL varchar(30), \
+            #                                                                                 ThumbnailURL varchar(30), \
+            #                                                                                 TotalLikes varchar(30), \
+            #                                                                                 TotalComments varchar(30))")
+            #
+            #         query = "INSERT INTO YT_channel_scraper.youtubers (YoutuberName , VideoTitle , VideoURL , " \
+            #                 "ThumbnailURL , TotalLikes , TotalComments ) VALUES (%s,%s,%s,%s,%s,%s) "
+            #         val = []
+            #         for i in range(n):
+            #             val.append(tuple(df.iloc[i]))
+            #
+            #         cursor.executemany(query, val)
+            #         mydb.commit()
+            #         print("Data INSERTED successfully INTO MySQL", '\n', "Database name : YT_channel_scraper", '\n',
+            #               "Table name : youtubers "
+            #               )
+            #     except Exception as e:
+            #         print("Failed to insert into MySQL with Error : ", e)
+            #     print(f"Time taken : {round(time.time() - st, 2)} sec")
+            #     print("*" * 30, '\n')
+            # except Exception as e:
+            #     print("MySQL : Connection Failed! with Error : ", e)
 
             # To store data in MongoDB
 
