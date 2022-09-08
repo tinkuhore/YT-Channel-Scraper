@@ -32,9 +32,11 @@ def index():
             x = YTChannelScraper(search, n)
             f_output = x.final_output()
 
-            # To store data in MySQL
+
             mdf = pd.DataFrame(f_output)
-            x.mysql_dumping(mdf, host, user, passwd, n)
+
+            # To store data in MySQL
+            # x.mysql_dumping(mdf, host, user, passwd, n)
 
             # To store data in MongoDB
             x.mongodb_dumping(mdf, username, password, n)
