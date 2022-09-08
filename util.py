@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 import time
+import os
 import pyshorteners as ps
 import mysql.connector
 import pymongo
@@ -13,24 +14,15 @@ import requests
 import pandas as pd
 
 
-
-
-
-
 class YTChannelScraper:
     def __init__(self, search, n):
         self.search = search
         self.n = n
 
     def final_output(self):
-        def get_channel_link() :
+        def get_channel_link(driver):
             try:
                 url = f"https://www.youtube.com/results?search_query={self.search}"
-
-                options = webdriver.ChromeOptions()
-                options.add_argument("headless")
-                driver = webdriver.Chrome(options=options)
-                driver.maximize_window()
 
                 driver.get(url)
 
@@ -47,13 +39,8 @@ class YTChannelScraper:
                 print("FAILED to get channel link with Error : ", e)
                 return None
 
-        def channel_name( url):
+        def channel_name(driver, url):
             try:
-
-                options = webdriver.ChromeOptions()
-                options.add_argument("headless")
-                driver = webdriver.Chrome(options=options)
-                driver.maximize_window()
                 driver.get(url)
 
                 soup = BeautifulSoup(driver.page_source, 'html.parser')
@@ -62,19 +49,15 @@ class YTChannelScraper:
                 channel_name = soup.select("#inner-header-container #text")[0].text
                 return channel_name
 
-            except :
+            except:
                 return "Failed!"
 
-        def get_video_title_links_thumb(url,n):
+        def get_video_title_links_thumb(driver, url, n):
             try:
                 st = time.time()
-                options = webdriver.ChromeOptions()
-                options.add_argument("headless")
-                driver = webdriver.Chrome(options=options)
-                driver.maximize_window()
                 driver.get(url)
 
-                scroll_h = int(n/10)*1000 + 500
+                scroll_h = int(n / 10) * 1000 + 500
                 for i in list(range(0, scroll_h, 500)):
                     driver.execute_script(f"window.scrollTo( {0 + i},{500 + i}, 'smooth')")
                     time.sleep(1)
@@ -84,7 +67,7 @@ class YTChannelScraper:
                 thumbnail = soup.select("#page-manager #contents #items img")
 
                 video_links = []
-                count=self.n
+                count = self.n
                 for i in range(self.n):
                     try:
                         title = v_details[i].text
@@ -113,20 +96,16 @@ class YTChannelScraper:
                          'Video URL': "Failed!",
                          'Thumbnail Link': "Failed!"}]
 
-        def like(url):
+        def like(driver, url):
             try:
-                st= time.time()
-                options = webdriver.ChromeOptions()
-                options.add_argument("headless")
-                wd = webdriver.Chrome(executable_path='chromedriver', options=options)
-                wd.maximize_window()
+                st = time.time()
 
-                wd.get(url)
-                wd.execute_script("window.scrollTo(0,300)")
+                driver.get(url)
+                driver.execute_script("window.scrollTo(0,300)")
                 time.sleep(1)
 
-                soup = BeautifulSoup(wd.page_source, 'html.parser')
-                wd.close()
+                soup = BeautifulSoup(driver.page_source, 'html.parser')
+                driver.close()
 
                 like = soup.select("ytd-toggle-button-renderer #text")[0].text
 
@@ -134,7 +113,7 @@ class YTChannelScraper:
                     print(f"Success : Like Count || Time taken : {int(time.time() - st)} sec")
                     like = soup.select("ytd-toggle-button-renderer #text")[1].text
                     return like
-                else :
+                else:
                     print(f"Success : Like Count || Time taken : {int(time.time() - st)} sec")
                     return like
             except Exception as e:
@@ -143,58 +122,57 @@ class YTChannelScraper:
 
         def comment(url):
             try:
-                st=time.time()
+                st = time.time()
                 options = webdriver.ChromeOptions()
                 options.add_experimental_option("excludeSwitches", ["enable-automation"])
                 options.add_experimental_option('useAutomationExtension', False)
                 options.add_argument('--headless')
                 options.add_argument('--window-size=1920,1080')
-                driver = webdriver.Chrome(options=options)  #, executable_path=r'chromedriver')
-                driver.get(url)
-                driver.execute_script("return scrollBy(0, 1000);")
-                subscribe = WebDriverWait(driver, 60).until(
+                chrome_options.add_argument("--disable-dev-shm-usage")
+                chrome_options.add_argument("--no-sandbox")
+                browser = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
+                browser.get(url)
+                browser.execute_script("return scrollBy(0, 1000);")
+                subscribe = WebDriverWait(browser, 60).until(
                     EC.visibility_of_element_located((By.XPATH, "//yt-formatted-string[text()='Subscribe']")))
-                driver.execute_script("arguments[0].scrollIntoView(true);", subscribe)
+                browser.execute_script("arguments[0].scrollIntoView(true);", subscribe)
                 # using xpath and text attribute
-                comment_count = WebDriverWait(driver, 10).until(
+                comment_count = WebDriverWait(browser, 10).until(
                     EC.visibility_of_element_located((By.XPATH, "//h2[@id='count']/yt-formatted-string"))).text
 
-                driver.quit()
+                browser.quit()
                 cc = comment_count.split(" ")[0]
-                if float(cc)>=0:
+                if float(cc) >= 0:
                     print(f"SUCCESS : Comment Count || Time taken : {int(time.time() - st)} sec.")
                     return cc
             except Exception as e:
                 print("Failed : Comment Count with Error -- ", e)
                 return 'NAN'
 
-        def all_comments(url):
-            def scroll_down(driver, sleep: int = 1, scroll_height: int = 200):
-                prev_h = 0
-                while True:
-                    height = driver.execute_script("""
-                            function getActualHeight() {
-                                return Math.max(
-                                    Math.max(document.body.scrollHeight, document.documentElement.scrollHeight),
-                                    Math.max(document.body.offsetHeight, document.documentElement.offsetHeight),
-                                    Math.max(document.body.clientHeight, document.documentElement.clientHeight)
-                                );
-                            }
-                            return getActualHeight();
-                        """)
-                    driver.execute_script(f"window.scrollTo({prev_h},{prev_h + scroll_height})")
-                    # fix the time sleep value according to your network connection
-                    time.sleep(sleep)
-                    prev_h += scroll_height
-                    if prev_h >= height:
-                        break
+        def all_comments(driver, url):
+            # def scroll_down(driver, sleep: int = 1, scroll_height: int = 200):
+            #     prev_h = 0
+            #     while True:
+            #         height = driver.execute_script("""
+            #                 function getActualHeight() {
+            #                     return Math.max(
+            #                         Math.max(document.body.scrollHeight, document.documentElement.scrollHeight),
+            #                         Math.max(document.body.offsetHeight, document.documentElement.offsetHeight),
+            #                         Math.max(document.body.clientHeight, document.documentElement.clientHeight)
+            #                     );
+            #                 }
+            #                 return getActualHeight();
+            #             """)
+            #         driver.execute_script(f"window.scrollTo({prev_h},{prev_h + scroll_height})")
+            #         # fix the time sleep value according to your network connection
+            #         time.sleep(sleep)
+            #         prev_h += scroll_height
+            #         if prev_h >= height:
+            #             break
 
             try:
                 st = time.time()
-                options = webdriver.ChromeOptions()
-                options.add_argument("headless")
-                driver = webdriver.Chrome(options=options)
-                driver.maximize_window()
+
                 driver.get(url)
                 for i in list(range(0, 10000, 500)):
                     driver.execute_script(f"window.scrollTo( {0 + i},{500 + i}, 'smooth')")
@@ -211,7 +189,7 @@ class YTChannelScraper:
                 # st2 = time.time()
                 comment_output = []
                 for i in range(len(comment_list)):
-                    comment_output.append([ commenter_list[i] , comment_list[i]])
+                    comment_output.append([commenter_list[i], comment_list[i]])
                 print(f"{len(comment_output)} comments extracted with name in {int((time.time() - st))} sec.")
                 # print(f"S.T.= {int(st1-st)}, E.T.= {st2-st1}, L.P.T={(time.time() - st2)}")
                 return comment_output
@@ -222,11 +200,20 @@ class YTChannelScraper:
         try:
 
             start = time.time()
-            channel_url = get_channel_link()
 
-            video_links = get_video_title_links_thumb(f"{channel_url}/videos", self.n)
+            chrome_options = webdriver.ChromeOptions()
+            chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+            chrome_options.add_argument("--headless")
+            chrome_options.add_argument("--disable-dev-shm-usage")
+            chrome_options.add_argument("--no-sandbox")
+            driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
+            driver.maximize_window()
 
-            f_output = {'Channel Name':[], 'Channel URL':[], 'Title': [], "Video Link": [], "Thumbnail Link": [],
+            channel_url = get_channel_link(driver)
+
+            video_links = get_video_title_links_thumb(driver,f"{channel_url}/videos", self.n)
+
+            f_output = {'Channel Name': [], 'Channel URL': [], 'Title': [], "Video Link": [], "Thumbnail Link": [],
                         'Total Likes': [], 'Total Comments': [], 'Comment Content': []}
             for count in range(0, self.n):
                 print('video ', count + 1, ' processing...')
@@ -234,7 +221,7 @@ class YTChannelScraper:
 
                 if video_link != "Failed!":
                     try:
-                        f_output['Channel Name'].append(channel_name(channel_url))
+                        f_output['Channel Name'].append(channel_name(driver, channel_url))
                         f_output['Channel URL'].append(channel_url)
                         f_output['Title'].append(video_links[count]["Title"])
                         f_output["Video Link"].append(video_link)
@@ -244,7 +231,7 @@ class YTChannelScraper:
                         print("Error4 : ", e)
 
                     try:
-                        f_output['Total Likes'].append(like(video_link))
+                        f_output['Total Likes'].append(like(driver, video_link))
                         f_output['Total Comments'].append(comment(video_link))
                         print("Likes and Comment count appended.")
                     except Exception as e:
@@ -252,27 +239,27 @@ class YTChannelScraper:
                         print("Error5 : ", e)
 
                     try:
-                        f_output['Comment Content'].append(all_comments(video_link))
+                        f_output['Comment Content'].append(all_comments(driver, video_link))
                         print("Comment content appended.")
                     except Exception as e:
                         print("Error6 : ", e)
 
                     print("_" * 100, '\n')
 
-            print( '*' * 25, '\n', f"Total time taken = {round((time.time() - start) / 60, 2)} mins.", '\n',
-                  '*' * 25,'\n' )
+            print('*' * 25, '\n', f"Total time taken = {round((time.time() - start) / 60, 2)} mins.", '\n',
+                  '*' * 25, '\n')
             return f_output
 
         except:
             print("Failed! : Error 7")
-            f_output = {'Channel Name': ["Failed!"], 'Channel URL':['Failed!'], 'Title': ["Failed!"],
+            f_output = {'Channel Name': ["Failed!"], 'Channel URL': ['Failed!'], 'Title': ["Failed!"],
                         "Video Link": ["Failed!"], "Thumbnail Link": ["Failed!"],
                         'Total Likes': ["Failed!"], 'Total Comments': ["Failed!"],
                         'Comment Content': [[["Failed!", "No Comments Extracted."]]]}
 
             return f_output
 
-    def mysql_dumping(self, mdf, host, user, passwd,n):
+    def mysql_dumping(self, mdf, host, user, passwd, n):
         df = mdf.drop(['Channel URL', 'Comment Content'], axis=1)
 
         try:
