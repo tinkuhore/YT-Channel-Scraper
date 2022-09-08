@@ -27,7 +27,7 @@ class YTChannelScraper:
                 driver.get(url)
 
                 soup = BeautifulSoup(driver.page_source, "html.parser")
-                driver.close()
+                # driver.close()
                 data = soup.find("ytd-video-renderer")
 
                 channel = data.find("a", {"class": "yt-simple-endpoint style-scope yt-formatted-string"})
@@ -44,7 +44,7 @@ class YTChannelScraper:
                 driver.get(url)
 
                 soup = BeautifulSoup(driver.page_source, 'html.parser')
-                driver.quit()
+                # driver.quit()
 
                 channel_name = soup.select("#inner-header-container #text")[0].text
                 return channel_name
@@ -62,7 +62,7 @@ class YTChannelScraper:
                     driver.execute_script(f"window.scrollTo( {0 + i},{500 + i}, 'smooth')")
                     time.sleep(1)
                     soup = BeautifulSoup(driver.page_source, 'html.parser')
-                driver.quit()
+                # driver.quit()
                 v_details = soup.select("#video-title")
                 thumbnail = soup.select("#page-manager #contents #items img")
 
@@ -105,7 +105,7 @@ class YTChannelScraper:
                 time.sleep(1)
 
                 soup = BeautifulSoup(driver.page_source, 'html.parser')
-                driver.close()
+                # driver.close()
 
                 like = soup.select("ytd-toggle-button-renderer #text")[0].text
 
@@ -130,7 +130,7 @@ class YTChannelScraper:
                 options.add_argument('--window-size=1920,1080')
                 chrome_options.add_argument("--disable-dev-shm-usage")
                 chrome_options.add_argument("--no-sandbox")
-                browser = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
+                browser = webdriver.Chrome( options=chrome_options, executable_path=os.environ.get("CHROMEDRIVER_PATH"))
                 browser.get(url)
                 browser.execute_script("return scrollBy(0, 1000);")
                 subscribe = WebDriverWait(browser, 60).until(
@@ -206,12 +206,12 @@ class YTChannelScraper:
             chrome_options.add_argument("--headless")
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.add_argument("--no-sandbox")
-            driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
+            driver = webdriver.Chrome( options=chrome_options, executable_path=os.environ.get("CHROMEDRIVER_PATH"))
             driver.maximize_window()
 
             channel_url = get_channel_link(driver)
 
-            video_links = get_video_title_links_thumb(driver,f"{channel_url}/videos", self.n)
+            video_links = get_video_title_links_thumb(driver, f"{channel_url}/videos", self.n)
 
             f_output = {'Channel Name': [], 'Channel URL': [], 'Title': [], "Video Link": [], "Thumbnail Link": [],
                         'Total Likes': [], 'Total Comments': [], 'Comment Content': []}
@@ -245,13 +245,13 @@ class YTChannelScraper:
                         print("Error6 : ", e)
 
                     print("_" * 100, '\n')
-
+            # driver.close()
             print('*' * 25, '\n', f"Total time taken = {round((time.time() - start) / 60, 2)} mins.", '\n',
                   '*' * 25, '\n')
             return f_output
 
-        except:
-            print("Failed! : Error 7")
+        except Exception as e:
+            print("Failed! : Error 7",e)
             f_output = {'Channel Name': ["Failed!"], 'Channel URL': ['Failed!'], 'Title': ["Failed!"],
                         "Video Link": ["Failed!"], "Thumbnail Link": ["Failed!"],
                         'Total Likes': ["Failed!"], 'Total Comments': ["Failed!"],
