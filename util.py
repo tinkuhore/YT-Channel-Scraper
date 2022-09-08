@@ -131,7 +131,7 @@ class YTChannelScraper:
                 options.add_argument('--window-size=1920,1080')
                 chrome_options.add_argument("--disable-dev-shm-usage")
                 chrome_options.add_argument("--no-sandbox")
-                browser = webdriver.Chrome( options=chrome_options), executable_path=os.environ.get("CHROMEDRIVER_PATH"))
+                browser = webdriver.Chrome( options=chrome_options, executable_path=os.environ.get("CHROMEDRIVER_PATH"))
                 browser.get(url)
                 browser.execute_script("return scrollBy(0, 1000);")
                 subscribe = WebDriverWait(browser, 60).until(
