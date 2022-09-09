@@ -36,7 +36,7 @@ def index():
             mdf = pd.DataFrame(f_output)
 
             # To store data in MySQL
-            # x.mysql_dumping(mdf, host, user, passwd, n)
+            x.mysql_dumping(mdf, host, user, passwd, n)
 
             # To store data in MongoDB
             x.mongodb_dumping(mdf, username, password, n)
