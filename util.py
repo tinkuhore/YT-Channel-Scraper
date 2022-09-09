@@ -171,11 +171,11 @@ class YTChannelScraper:
             start = time.time()
 
             chrome_options = webdriver.ChromeOptions()
-            # chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+            chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
             chrome_options.add_argument("--headless")
-            # chrome_options.add_argument("--disable-dev-shm-usage")
-            # chrome_options.add_argument("--no-sandbox")
-            driver = webdriver.Chrome( options=chrome_options)#, executable_path=os.environ.get("CHROMEDRIVER_PATH"))
+            chrome_options.add_argument("--disable-dev-shm-usage")
+            chrome_options.add_argument("--no-sandbox")
+            driver = webdriver.Chrome( options=chrome_options, executable_path=os.environ.get("CHROMEDRIVER_PATH"))
             driver.maximize_window()
 
             channel_url = get_channel_link(driver)
@@ -201,12 +201,12 @@ class YTChannelScraper:
                         print("Error4 : ", e)
 
                     chrome_options = webdriver.ChromeOptions()
-                    # chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+                    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
                     chrome_options.add_argument("--headless")
-                    # chrome_options.add_argument("--disable-dev-shm-usage")
-                    # chrome_options.add_argument("--no-sandbox")
+                    chrome_options.add_argument("--disable-dev-shm-usage")
+                    chrome_options.add_argument("--no-sandbox")
                     driver = webdriver.Chrome(
-                        options=chrome_options)  # , executable_path=os.environ.get("CHROMEDRIVER_PATH"))
+                        options=chrome_options , executable_path=os.environ.get("CHROMEDRIVER_PATH"))
                     driver.maximize_window()
 
                     try:
