@@ -41,6 +41,9 @@ def index():
             # To store data in MongoDB
             x.mongodb_dumping(mdf, username, password, n)
 
+            # To upload videos in AWS S3 bucket
+            x.video_downloader(mdf)
+
             return render_template('results.html', reviews=f_output, n=n)
         except Exception as e:
             print('The Exception message is: ', e)
